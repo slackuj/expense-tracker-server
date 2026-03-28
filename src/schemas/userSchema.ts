@@ -8,7 +8,7 @@ const strongPasswordSchema = z.string()
     .regex(/[0-9]/, "Password must contain at least one number")
     .regex(/[^A-Za-z0-9]/, "Password must contain at least one special character");
 
-const UserRegisterRequestSchema = z.object({
+export const UserRegisterRequestSchema = z.object({
     name: z.string().min(5, "Name must be at least 5 characters"),
     email: z.email("Please enter a valid email address"),
     password: strongPasswordSchema,
@@ -18,9 +18,9 @@ const UserRegisterRequestSchema = z.object({
         message: "Passwords don't match",
         path: ["confirmPassword"], // This attaches the error to the confirmPassword field
     }
-);
+).transform(({ confirmPassword, ...data }) => data);// strips confirmPassword from the final object returned by zod after validation (i.e schema.safeParse(req.body) inside validator.ts !!!)
 
-const UserLoginRequestSchema = z.object({
+export const UserLoginRequestSchema = z.object({
     email: z.email("Please enter a valid email address"),
     password: z.string().min(8, "The password you entered is incorrect"),
 });

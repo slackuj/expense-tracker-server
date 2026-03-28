@@ -16,7 +16,10 @@ interface ErrorParams {
 }
 
 
-export const successResponse = (res: Response, { data = null, message = null, meta = null, status = 200 }: SuccessParams) => {
+export const successResponse = (
+    res: Response,
+    { data = null, message = null, meta = null, status = 200 }: SuccessParams
+) => {
     return res.status(status).json({
         success: true,
         data,
@@ -25,7 +28,10 @@ export const successResponse = (res: Response, { data = null, message = null, me
     });
 };
 
-export const errorResponse = (res: Response, { message = "Something went wrong", code = httpCodes.INTERNAL_SERVER_ERROR.message, details = null, status = httpCodes.INTERNAL_SERVER_ERROR.statusCode }: ErrorParams) => {
+export const errorResponse = (
+    res: Response,
+    { message = "Something went wrong", code = httpCodes.INTERNAL_SERVER_ERROR.message, details = null, status = httpCodes.INTERNAL_SERVER_ERROR.statusCode }: ErrorParams
+) => {
     return res.status(status).json({
         success: false,
         data: null,
