@@ -9,3 +9,9 @@ export const createSession = async(data: UserSession) => {
         expiresAt
     });
 };
+
+export const deleteSessionById = async (userId: string) => {
+    await SessionModel.findOneAndDelete({
+        userId
+    }).exec();
+};
