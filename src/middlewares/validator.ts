@@ -11,7 +11,7 @@ export const validateRequestBody = (schema: z.ZodType<any>) => (
     if (!result.success) {
         return res.status(400).json({
             message: "validation failed",
-            errors: z.treeifyError(result.error)
+            errors: z.prettifyError(result.error)
         })
     }
 
@@ -30,7 +30,7 @@ export const validateQueryParams = (schema: z.ZodType<any>) => (
     if (!result.success) {
         return res.status(400).json({
             message: "validation failed",
-            errors: z.treeifyError(result.error)
+            errors: z.prettifyError(result.error)
         })
     }
 
@@ -50,7 +50,7 @@ export const validateParams = (schema: z.ZodType<any>) => (
     if (!result.success) {
         return res.status(400).json({
             message: "validation failed",
-            errors: z.treeifyError(result.error)
+            errors: z.prettifyError(result.error)
         })
     }
 
