@@ -7,11 +7,10 @@ mongoose.plugin( schema => {
     schema.set("toJSON", {
         virtuals: true ,
         versionKey: false,
-        // check if it works without delete ret._id !!!
-        /*transform: (_doc, ret) => {
+        transform: (_doc, ret) => {
             delete ret._id;
             return ret;
-        }*/
+        }
     });
 });
 
