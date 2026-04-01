@@ -19,5 +19,5 @@ export const deleteUserById = async (userId: string) => {
     if (!user) {
         throw new Error("User not found");
     }
-    await sessionServices.deleteSessionById(userId);
+    await sessionServices.deleteSessionsById(userId);
 };

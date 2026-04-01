@@ -6,17 +6,6 @@ export interface IUser extends mongoose.Document {
     password: string;
 }
 
-mongoose.plugin( schema => {
-    schema.set("toJSON", {
-        virtuals: true ,
-        versionKey: false,
-        transform: (_doc, ret) => {
-            delete ret._id;
-            return ret;
-        }
-    });
-});
-
 const userSchema = new mongoose.Schema<IUser>({
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },

@@ -57,3 +57,8 @@ export const login = async (data: UserLoginRequest) => {
         throw new Error("Failed to initialize session. Please try again.");
     }
 };
+
+/*
+export const logout = async (refreshToken: string) => {
+    await sessionServices.deleteSessionByRefreshToken(refreshToken);
+};*/

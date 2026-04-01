@@ -18,6 +18,12 @@ export interface UserSession {
     expiresAt: Date;
 }
 
+export interface AuthenticatedUser {
+    id: string;
+    email: string;
+    name: string;
+}
+
 /*
 YOU ALSO NEED TO CHECK ACCESS TOKEN, WHEN OPERATIONS ARE BEING CARRIED OUT VIA USER'S ACCOUNT.
 THEREFORE, POSTPONED FOR NOW !!!
