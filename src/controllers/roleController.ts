@@ -1,6 +1,6 @@
 import {Request, Response, NextFunction} from "express";
 import {notFoundResponse, successResponse} from "../utils/responseHelper";
-import * as permissionServices from "../services/permissionServices";
+import * as roleServices from "../services/roleServices";
 import {httpCodes} from "../constants/httpCodes";
 
 export const create = async (
@@ -9,7 +9,7 @@ export const create = async (
     next: NextFunction
 ) => {
     try{
-        const response = await permissionServices.create(req.body);
+        const response = await roleServices.create(req.body);
         return successResponse(
             res,
             { data: response }
@@ -27,7 +27,7 @@ export const updateById = async (
     try{
         const id = String(req.params.id);
         const data = req.body;
-        const response = await permissionServices.updateById(id, data);
+        const response = await roleServices.updateById(id, data);
         return successResponse(
             res,
             { data: response }
@@ -44,7 +44,7 @@ export const deleteById = async (
 ) => {
     try{
         const id = String(req.params.id);
-        await permissionServices.deleteById(id);
+        await roleServices.deleteById(id);
         return successResponse(
             res,
             {
@@ -62,7 +62,7 @@ export const getAll = async (
     next: NextFunction
 ) => {
     try{
-        const response = await permissionServices.getAll();
+        const response = await roleServices.getAll();
 
         return successResponse(
             res,
@@ -80,11 +80,11 @@ export const getById = async(
 ) => {
     try{
         const id = String(req.params.id);
-        const response = await permissionServices.getById(id);
+        const response = await roleServices.getById(id);
         if (!response) {
             return notFoundResponse(
                 res,
-                {message : "Permission not found"}
+                {message : "Role not found"}
             );
         }
         return successResponse(

@@ -15,6 +15,11 @@ interface ErrorParams {
     status?: number;
 }
 
+interface NotFoundParams {
+    data?: any;
+    message?: string | null;
+    status?: number;
+}
 
 export const successResponse = (
     res: Response,
@@ -40,5 +45,16 @@ export const errorResponse = (
             code,
             details
         }
+    });
+};
+
+export const notFoundResponse = (
+    res: Response,
+    { data = null, message = null, status = 404 }: NotFoundParams
+) => {
+    return res.status(status).json({
+        success: false,
+        data,
+        message,
     });
 };
