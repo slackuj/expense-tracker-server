@@ -20,10 +20,6 @@ export const appRoles = {
     USER: {
         name: "USER",
         description: "User role",
-        permissions: [
-            appPermissions.VIEW_ROLES.name,
-            appPermissions.VIEW_PERMISSIONS.name,
-            appPermissions.VIEW_USERS.name,
-        ]
+        permissions: []
     }
 };

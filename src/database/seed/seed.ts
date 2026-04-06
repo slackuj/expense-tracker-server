@@ -14,24 +14,54 @@ dotenv.config();
 
 const seed = async () => {
     const mongoURI = process.env.MONGO_URI;
-    const superAdminEmail = process.env.SUPER_ADMIN_EMAIL;
-    const superAdminPassword = process.env.SUPER_ADMIN_PASSWORD;
-    const superAdminName = process.env.SUPER_ADMIN_NAME;
+    const SUPER_ADMIN_EMAIL = process.env.SUPER_ADMIN_EMAIL;
+    const SUPER_ADMIN_PASSWORD = process.env.SUPER_ADMIN_PASSWORD;
+    const SUPER_ADMIN_NAME = process.env.SUPER_ADMIN_NAME;
+    const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
+    const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
+    const ADMIN_NAME = process.env.ADMIN_NAME;
+    const USER_EMAIL = process.env.USER_EMAIL;
+    const USER_NAME = process.env.USER_NAME;
+    const USER_PASSWORD = process.env.USER_PASSWORD;
 
     if (!mongoURI) {
         throw new Error("MONGO_URI is not defined");
     }
 
-    if (!superAdminEmail) {
+    if (!SUPER_ADMIN_EMAIL) {
         throw new Error("SUPER_ADMIN_EMAIL is not defined");
     }
 
-    if (!superAdminPassword) {
+    if (!SUPER_ADMIN_PASSWORD) {
         throw new Error("SUPER_ADMIN_PASSWORD is not defined");
     }
 
-    if (!superAdminName) {
+    if (!SUPER_ADMIN_NAME) {
         throw new Error("SUPER_ADMIN_NAME is not defined");
+    }
+
+    if (!ADMIN_EMAIL) {
+        throw new Error("ADMIN_EMAIL is not defined");
+    }
+
+    if (!ADMIN_PASSWORD) {
+        throw new Error("ADMIN_PASSWORD is not defined");
+    }
+
+    if (!ADMIN_NAME) {
+        throw new Error("ADMIN_NAME is not defined");
+    }
+
+    if (!USER_EMAIL) {
+        throw new Error("USER_EMAIL is not defined");
+    }
+
+    if (!USER_NAME) {
+        throw new Error("USER_NAME is not defined");
+    }
+
+    if (!USER_PASSWORD) {
+        throw new Error("USER_PASSWORD is not defined");
     }
 
     // Connect to MongoDB
@@ -45,25 +75,63 @@ const seed = async () => {
     await PermissionModel.deleteMany();
     console.log("Deleted all existing documents!");
 
+    // create permissions
     // Transform the object into an array of values and insert at once !!!
     const permissionsArray = Object.values(appPermissions);
     const permissions = await PermissionModel.insertMany(permissionsArray);
     console.log(`${permissions.length} permissions inserted!`);
 
+
+    const permissionMap = permissions.reduce((acc, p) => {
+        acc[p.name] = p._id;
+        return acc;
+    }, {} as Record<string, any>);
+
+
+    //create roles
+    // transform [permission names] into [permission IDs] and convert roles into rolesArray
+    const rolesArray = Object.values(appRoles).map((role) => ({
+        ...role,
+        // Use .map() to swap the name string for the actual Mongo ID from our lookup
+        permissions: role.permissions.map(pName => permissionMap[pName])
+    }));
+
     // Transform the object into an array of values and insert at once !!!
-    const rolesArray = Object.values(appRoles);
     const roles = await RoleModel.insertMany(rolesArray);
     console.log(`${roles.length} roles inserted!`);
 
     // create SUPER ADMIN
-    const role = await RoleModel.findOne({ name: "SUPER_ADMIN" }).select({ _id: 1 }).lean();
-    const hashedPassword = await bcrypt.hash(superAdminPassword, SALT_ROUNDS);
+    const superAdmin = await RoleModel.findOne({ name: "SUPER_ADMIN" }).select({ _id: 1 }).lean();
+    let hashedPassword = await bcrypt.hash(SUPER_ADMIN_PASSWORD, SALT_ROUNDS);
     await UserModel.create({
-        name: superAdminName,
-        email: superAdminEmail,
+        name: SUPER_ADMIN_NAME,
+        email: SUPER_ADMIN_EMAIL,
         password: hashedPassword,
-        roles: [String(role!._id)]
+        roles: [String(superAdmin!._id)]
     });
+    console.log("SUPER_ADMIN created...");
+
+    // create ADMIN
+    const admin = await RoleModel.findOne({ name: "ADMIN" }).select({ _id: 1 }).lean();
+    hashedPassword = await bcrypt.hash(ADMIN_PASSWORD, SALT_ROUNDS);
+    await UserModel.create({
+        name: ADMIN_NAME,
+        email: ADMIN_EMAIL,
+        password: hashedPassword,
+        roles: [String(admin!._id)]
+    });
+    console.log("ADMIN created...");
+
+    // create USER
+    const user = await RoleModel.findOne({ name: "USER" }).select({ _id: 1 }).lean();
+    hashedPassword = await bcrypt.hash(USER_PASSWORD, SALT_ROUNDS);
+    await UserModel.create({
+        name: USER_NAME,
+        email: USER_EMAIL,
+        password: hashedPassword,
+        roles: [String(user!._id)]
+    });
+    console.log("USER created...");
 
     console.log("Seeding completed");
 

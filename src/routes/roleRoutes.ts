@@ -12,4 +12,4 @@ roleRoutes.post("/", validateRequestBody(CreateRoleSchema), authenticate, author
 roleRoutes.patch("/:id", validateParams(IdSchema), validateRequestBody(UpdateRoleSchema), authenticate, authorize(appPermissions.MANAGE_ROLES.name), roleController.updateById);
 roleRoutes.delete("/:id", validateParams(IdSchema), authenticate, authorize(appPermissions.MANAGE_ROLES.name), roleController.deleteById);
 roleRoutes.get("/:id", validateParams(IdSchema), authenticate, authorize(appPermissions.VIEW_ROLES.name), roleController.getById);
-roleRoutes.get("/", authorize(appPermissions.VIEW_ROLES.name),  authenticate, roleController.getAll);
+roleRoutes.get("/", authenticate, authorize(appPermissions.VIEW_ROLES.name), roleController.getAll);

@@ -3,7 +3,15 @@ import { IUser } from "../models/UserModel";
 import { config } from "../config";
 
 export const generateAccessToken = (user : IUser) => {
-    const userRoles = String(user.roles.map((role: any) => role.name));
+    // extract array of role names
+    const userRoles: string[] = user.roles.map((role: any) => role.name);
+    // Extract and flatten all Permission names from those roles
+    // Use Set to ensure unique permissions if a user has multiple roles
+    const permissionNames: string[] = Array.from(new Set(
+        user.roles.flatMap((role: any) =>
+            role.permissions ? role.permissions.map((p: any) => p.name) : []
+        )
+    ));
     return jwt.sign(
         {
             exp: Math.floor(Date.now() / 1000) + 15 * 60, //  15 minutes
@@ -11,6 +19,7 @@ export const generateAccessToken = (user : IUser) => {
             name: user.name,
             email: user.email,
             roles: userRoles,
+            permissions: permissionNames,
         },
         config.JWT_SECRET_ACCESS,
     )

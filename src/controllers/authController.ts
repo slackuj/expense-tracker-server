@@ -42,7 +42,7 @@ export const refresh = async(
     next: NextFunction
 ) => {
     try {
-        const refreshToken = String(req.cookies?.refreshToken);
+        const refreshToken = req.cookies?.refreshToken;
         if (!refreshToken) {
             return unauthorizedResponse( res, { message: "Refresh token missing" });
         }

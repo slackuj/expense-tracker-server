@@ -9,23 +9,27 @@ export const create = async (data: CreateRoleRequest) => {
         throw new Error(`Role ${data.name} already exists!`);
     }
 
-    // referential integrity check
+    // checking referential integrity and converting [permission names] into [permission IDs]
     if (data.permissions && data.permissions.length > 0) {
-        const count = await PermissionModel.countDocuments({ _id: { $in: data.permissions } });
-        if (count !== data.permissions.length) {
-            throw new Error("One or more Permission IDs are invalid.");
+        const permissions = await PermissionModel.find({ name: { $in: data.permissions } });
+        const permissionIds = permissions.map(p => p.id);
+        if (permissionIds.length !== data.permissions.length) {
+            throw new Error("One or more Permissions are invalid.");
         }
+        data.permissions = permissionIds;
     }
     return await (await RoleModel.create(data)).populate("permissions");
 }
 
 export const updateById = async (id: string, data: EditRoleRequest) => {
-    // referential integrity check
+    // checking referential integrity and converting [permission names] into [permission IDs]
     if (data.permissions && data.permissions.length > 0) {
-        const count = await PermissionModel.countDocuments({ _id: { $in: data.permissions } });
-        if (count !== data.permissions.length) {
-            throw new Error("One or more Permission IDs are invalid.");
+        const permissions = await PermissionModel.find({ name: { $in: data.permissions } });
+        const permissionIds = permissions.map(p => p.id);
+        if (permissionIds.length !== data.permissions.length) {
+            throw new Error("One or more Permissions are invalid.");
         }
+        data.permissions = permissionIds;
     }
     const updatedRole =  await RoleModel.findByIdAndUpdate(
         id,

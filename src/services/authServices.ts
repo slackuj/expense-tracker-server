@@ -23,7 +23,7 @@ export const register = async (data: registerData) => {
         name,
         email,
         password: hashedPassword,
-        roles: [String(role!._id)] // default role === "USER"
+        roles: [String(role!.id)] // default role === "USER"
     });
 };
 
@@ -31,7 +31,14 @@ export const login = async (data: UserLoginRequest) => {
 
     const { email, password } = data;
     const user = await UserModel.findOne({ email })
-        .populate({ path: "roles", select: 'name'}) // roles object array mapped into role names array inside generateAccessToken
+        .populate({
+            path: "roles",
+            select: 'name',
+            populate: {
+                path:"permissions",
+                select: 'name'
+            }
+        }) // ( roles  & names ) object array mapped into names array inside generateAccessToken
         .select("+password");
 
     if (!user) {
@@ -80,7 +87,15 @@ export const refreshAccessToken = async (refreshToken: string) => {
 
     // 3. Fetch the user to get the latest data for the new access token
     // required for cases like database sync failure on user deletion or user may be deactivated/banned etc...
-    const user = await UserModel.findById(payload.userId);
+    const user = await UserModel.findById(payload.userId)
+        .populate({
+            path: "roles",
+            select: "name",
+            populate: {
+                path: "permissions",
+                select: "name"
+            }
+        });
     if (!user) {
         throw new Error("User no longer exists");
     }
@@ -89,11 +104,22 @@ export const refreshAccessToken = async (refreshToken: string) => {
     await sessionServices.deleteSessionByToken(refreshToken);
     const newAccessToken = generateAccessToken(user);
     const newRefreshToken = generateRefreshToken(user);
-
-    return {
-        accessToken: newAccessToken,
-        refreshToken: newRefreshToken
-    };
+    try {
+        const refreshTokenData = jwt.verify(refreshToken, config.JWT_SECRET_REFRESH) as JwtPayload;
+        const expiresAt = new Date(refreshTokenData.exp! * 1000);
+        await sessionServices.createSession({
+            userId: user.id,
+            refreshToken,
+            expiresAt
+        });
+        return {
+            accessToken: newAccessToken,
+            refreshToken: newRefreshToken
+        };
+    } catch (error) {
+        //console.log(error);
+        throw new Error("Failed to initialize session. Please try again.");
+    }
 };
 /*
 export const logout = async (refreshToken: string) => {

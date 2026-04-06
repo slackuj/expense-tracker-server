@@ -18,6 +18,6 @@ app.listen(config.PORT, () => {
     console.log(`Server started on port ${config.PORT}`);
 });
 
+app.use(cookieParser());
 app.use("/api", routes);
 app.use(errorHandler);
-app.use(cookieParser());

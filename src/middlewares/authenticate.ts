@@ -1,13 +1,10 @@
 // checks for access token ! and populates Request with the user
-import { Request, Response, NextFunction } from "express";
+import { Response, NextFunction } from "express";
 import { errorResponse } from "../utils/responseHelper";
 import jwt from "jsonwebtoken";
 import { config } from "../config";
 import { AuthenticatedUser } from "../types/user";
-
-export interface AuthRequest extends Request {
-    user?: AuthenticatedUser;
-}
+import {AuthRequest} from "../types/request";
 
 export const authenticate = (
     req: AuthRequest,

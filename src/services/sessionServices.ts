@@ -10,7 +10,7 @@ export const createSession = async(data: UserSession) => {
     });
 };
 
-// used when user's account is being deleted
+// used when user's account is being deleted or user roles are updated
 export const deleteSessionsById = async (userId: string) => {
     // using deletMany considering multiple device login
     await SessionModel.deleteMany({
