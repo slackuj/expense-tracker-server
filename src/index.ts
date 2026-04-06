@@ -4,6 +4,7 @@ import cors from "cors";
 import {config} from "./config";
 import {errorHandler} from "./middlewares/errorHandler";
 import {routes} from "./routes";
+import cookieParser from "cookie-parser";
 
 export const app = express();
 
@@ -19,3 +20,4 @@ app.listen(config.PORT, () => {
 
 app.use("/api", routes);
 app.use(errorHandler);
+app.use(cookieParser());

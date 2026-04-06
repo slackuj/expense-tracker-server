@@ -7,7 +7,3 @@ export const CreatePermissionSchema =  z.object({
 });
 
 export const UpdatePermissionSchema =  CreatePermissionSchema.partial();
-
-export const PermissionIdSchema =  z.object({
-    id: objectId,
-})

@@ -11,4 +11,12 @@ export const httpCodes = {
         statusCode: 204,
         message: null
     },
+    UNAUTHORIZED: {
+        statusCode: 401,
+        message: "Unauthorized access"
+    },
+    FORBIDDEN: {
+        statusCode: 403,
+        message: "Permission denied"
+    },
 }

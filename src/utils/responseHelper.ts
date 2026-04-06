@@ -58,3 +58,22 @@ export const notFoundResponse = (
         message,
     });
 };
+
+export const unauthorizedResponse = (
+    res: Response,
+    {
+        message = httpCodes.UNAUTHORIZED.message,
+        code = "UNAUTHORIZED",
+        status = httpCodes.UNAUTHORIZED.statusCode
+    }: ErrorParams
+) => {
+    return res.status(status).json({
+        success: false,
+        data: null,
+        message,
+        error: {
+            code,
+            details: null
+        }
+    });
+};

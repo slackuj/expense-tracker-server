@@ -1,6 +1,6 @@
 import {NextFunction, Response, Request} from "express";
 import * as authServices from "../services/authServices";
-import {successResponse} from "../utils/responseHelper";
+import {errorResponse, successResponse, unauthorizedResponse} from "../utils/responseHelper";
 import {httpCodes} from "../constants/httpCodes";
 
 export const register = async(
@@ -31,6 +31,24 @@ export const login = async(
             res,
             { data: response },
         );
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const refresh = async(
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    try {
+        const refreshToken = String(req.cookies?.refreshToken);
+        if (!refreshToken) {
+            return unauthorizedResponse( res, { message: "Refresh token missing" });
+        }
+
+        const response = await authServices.refreshAccessToken(refreshToken);
+        return successResponse( res, { data: response });
     } catch (error) {
         next(error);
     }

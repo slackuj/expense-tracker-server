@@ -8,7 +8,3 @@ export const CreateRoleSchema =  z.object({
 });
 
 export const UpdateRoleSchema =  CreateRoleSchema.partial();
-
-export const RoleIdSchema =  z.object({
-    id: objectId,
-})

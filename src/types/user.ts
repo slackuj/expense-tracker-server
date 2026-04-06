@@ -1,5 +1,3 @@
-import mongoose from "mongoose";
-
 export interface UserRegisterRequest  {
     name: string;
     email: string;
@@ -13,7 +11,7 @@ export interface UserLoginRequest {
 }
 
 export interface UserSession {
-    userId: mongoose.Types.ObjectId;
+    userId: string;
     refreshToken: string;
     expiresAt: Date;
 }
@@ -22,6 +20,15 @@ export interface AuthenticatedUser {
     id: string;
     email: string;
     name: string;
+    roles: string[];// array of roles
+    //permissions: string[];// array of permission IDs
+}
+
+export interface Role {
+    id: string;
+    name: string;
+    description: string;
+    permissions: string[];// array of permission IDs
 }
 
 /*
