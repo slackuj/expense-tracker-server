@@ -7,7 +7,8 @@ mongoose.plugin( schema => {
         virtuals: true ,
         versionKey: false,
         transform: (_doc, ret) => {
-            delete ret._id;
+            if (ret._id) delete ret._id;
+            else delete ret.id; // do not return id, as it will be returned as null
             return ret;
         }
     });

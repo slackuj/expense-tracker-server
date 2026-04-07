@@ -1,4 +1,4 @@
-import {UserLoginRequest, UserRegisterRequest} from "../types/user";
+import {AuthenticatedUser, UserLoginRequest, UserRegisterRequest} from "../types/user";
 import {UserModel} from "../models/UserModel";
 import {SALT_ROUNDS} from "../constants/authConstants";
 import bcrypt from "bcrypt";
@@ -32,14 +32,16 @@ export const login = async (data: UserLoginRequest) => {
     const { email, password } = data;
     const user = await UserModel.findOne({ email })
         .populate({
-            path: "roles",
-            select: 'name',
+        path: "roles",
+        select: "name -_id",
+        transform: doc => doc === null ? null : doc.name,
             populate: {
                 path:"permissions",
-                select: 'name'
+                select: "name -_id",
+                transform: doc => doc === null ? null : doc.name,
             }
         }) // ( roles  & names ) object array mapped into names array inside generateAccessToken
-        .select("+password");
+        .select("+password") as AuthenticatedUser;
 
     if (!user) {
         throw new Error("User not found");
@@ -90,12 +92,14 @@ export const refreshAccessToken = async (refreshToken: string) => {
     const user = await UserModel.findById(payload.userId)
         .populate({
             path: "roles",
-            select: "name",
+            select: "name -_id",
+            transform: doc => doc === null ? null : doc.name,
             populate: {
                 path: "permissions",
-                select: "name"
+                select: "name -_id",
+                transform: doc => doc === null ? null : doc.name,
             }
-        });
+        }).select("+password") as AuthenticatedUser;// as AuthenticatedUser type conversion works when `.select("+password") is appended !!!
     if (!user) {
         throw new Error("User no longer exists");
     }

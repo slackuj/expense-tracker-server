@@ -20,6 +20,7 @@ export interface AuthenticatedUser {
     id: string;
     email: string;
     name: string;
+    password: string;
     roles: string[];// array of role names
     permissions: string[];// array of permission names
 }
