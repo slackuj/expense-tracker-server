@@ -14,6 +14,7 @@ export const appRoles = {
             appPermissions.VIEW_PERMISSIONS.name,
             appPermissions.CREATE_USERS.name,
             appPermissions.MANAGE_USERS.name,
+            appPermissions.MANAGE_USER_ROLES.name,
             appPermissions.VIEW_USERS.name,
         ]
     },

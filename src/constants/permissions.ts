@@ -11,6 +11,10 @@ export const appPermissions = {
         name: "MANAGE_ROLES",
         description: "edit or delete existing roles"
     },
+    MANAGE_USER_ROLES: {
+        name: "MANAGE_USER_ROLES",
+        description: "edit or delete existing user roles"
+    },
     CREATE_PERMISSIONS: {
         name: "CREATE_PERMISSIONS",
         description: "Create new permissions"

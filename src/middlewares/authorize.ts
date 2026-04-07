@@ -1,6 +1,7 @@
 import { NextFunction, Response } from "express";
 import { AuthenticatedRequest } from "../types/request";
 import {unauthorizedResponse} from "../utils/responseHelper";
+import {appPermissions} from "../constants/permissions";
 
 export const authorize = (requiredPermission: string) => {
     return async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
@@ -9,8 +10,9 @@ export const authorize = (requiredPermission: string) => {
         if (!user) return next(new Error("User not authenticated"));
         // user.id from jwt, requestedId from params `/:id`
         const isOwner = user.id === requestedId;
+        //console.log(user.id, requestedId, isOwner);
         // BE CAUTIOUS ABOUT THIS AUTHORIZATION SIDE EFFECTS !!!!!
-        if (isOwner) return next();
+        if (isOwner && requiredPermission != appPermissions.MANAGE_USER_ROLES.name) return next();
 
         // Bypass Super Admin
         if (user.roles.includes("SUPER_ADMIN")) return next();
