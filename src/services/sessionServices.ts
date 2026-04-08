@@ -30,11 +30,3 @@ export const deleteSessionByToken = async (refreshToken: string) => {
 export const findSessionByToken = async (refreshToken: string) => {
     return await SessionModel.findOne({ refreshToken }).exec();
 };
-
-/*
-                  U S E D    D U R I N G    L O G O U T
-export const deleteSessionByRefreshToken = async (refreshToken: string) => {
-    await SessionModel.findOneAndDelete({
-        refreshToken
-    });
-};*/

@@ -7,7 +7,7 @@ export const httpCodes = {
         statusCode: 500,
         message: "Internal server error"
     },
-    RESOURCE_DELETED: {
+    NO_CONTENT: {
         statusCode: 204,
         message: null
     },

@@ -1,6 +1,6 @@
 import {NextFunction, Response, Request} from "express";
 import * as authServices from "../services/authServices";
-import {errorResponse, successResponse, unauthorizedResponse} from "../utils/responseHelper";
+import {successResponse, unauthorizedResponse} from "../utils/responseHelper";
 import {httpCodes} from "../constants/httpCodes";
 
 export const register = async(
@@ -49,6 +49,24 @@ export const refresh = async(
 
         const response = await authServices.refreshAccessToken(refreshToken);
         return successResponse( res, { data: response });
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const logout = async(
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    try {
+        const refreshToken = req.cookies?.refreshToken;
+        if (!refreshToken) {
+            return unauthorizedResponse( res, { status: httpCodes.UNAUTHORIZED.statusCode, message: "Refresh token missing" });
+        }
+
+        await authServices.logout(refreshToken);
+        return successResponse( res, { status: httpCodes.NO_CONTENT.statusCode } );
     } catch (error) {
         next(error);
     }

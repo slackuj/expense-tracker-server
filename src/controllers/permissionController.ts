@@ -48,7 +48,7 @@ export const deleteById = async (
         return successResponse(
             res,
             {
-                status: httpCodes.RESOURCE_DELETED.statusCode,
+                status: httpCodes.NO_CONTENT.statusCode,
             },
             );
     } catch (error) {

@@ -126,7 +126,6 @@ export const refreshAccessToken = async (refreshToken: string) => {
         throw new Error("Failed to initialize session. Please try again.");
     }
 };
-/*
 export const logout = async (refreshToken: string) => {
-    await sessionServices.deleteSessionByRefreshToken(refreshToken);
-};*/
+    await sessionServices.deleteSessionByToken(refreshToken);
+};
