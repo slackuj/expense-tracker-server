@@ -19,5 +19,6 @@ export const authenticate = (
 
     req.user = jwt.verify(token, config.JWT_SECRET_ACCESS) as AuthenticatedUser;
     //console.log(`req.user inside authenticate.ts : ${JSON.stringify(req.user)}`);
+    console.log("Welcome",req.user.name);
     next();
 }

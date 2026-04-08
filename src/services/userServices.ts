@@ -14,29 +14,58 @@ export const fetchAllUsers = async () => (
         select: "name -_id",
         transform: doc => doc === null ? null : doc.name
         //select: "name",
-    }).exec()
+    }).sort({ name: 1, _id: 1 })
+        .exec()
 );
 
-export const fetchUserById = async (userId: string) => {
-    const user = await UserModel.findOne({
-        _id: userId,
-        name: { $ne: "slackuj" } // do not allow to fetch SUPER ADMIN info
-    })
-        .populate({
-            path: "roles",
-            // explicitly remove _id
-            select: "name -_id",
-            // transforming populated data
-            transform: doc => doc === null ? null : doc.name
-            //select: "name",
-        })
-        .exec();
-    if (!user) {
-        throw new Error("User not found");
-    }
+interface fetchUserData {
+    userId?: string;
+    currentUserId?: string;
+}
 
-    return user;
-};
+export const fetchUserById = async (data: fetchUserData) => {
+    const { userId, currentUserId } = data;
+    if ( currentUserId ) {
+
+        console.log(currentUserId);
+        return await UserModel.findById(
+            currentUserId
+            )
+            .populate({
+                path: "roles",
+                // explicitly remove _id
+                select: "name -_id",
+                transform: doc => doc === null ? null : doc.name,
+                // QUERY FAILING ON RECURSIVE POPULATION...HANDLE LATER
+                /*populate: {
+                    path: "permissions",
+                    select: "name -id",
+                    transform: doc => doc === null ? null : doc.name,
+                },*/
+                //select: "name",
+            })
+            .exec();
+    } else if ( userId ) {
+        console.log(userId);
+        const user = await UserModel.findOne({
+            _id: userId,
+            name: { $ne: "slackuj" } // do not allow to fetch SUPER ADMIN info
+        })
+            .populate({
+                path: "roles",
+                // explicitly remove _id
+                select: "name -_id",
+                // transforming populated data
+                transform: doc => doc === null ? null : doc.name
+                //select: "name",
+            })
+            .exec();
+        if (!user) {
+            throw new Error("User not found");
+        }
+
+        return user;
+    }};
 
 export const deleteUserById = async (userId: string) => {
     const user = await UserModel.findOneAndDelete({
@@ -76,11 +105,9 @@ export const updateUserRolesById = async (userId: string, data: EditUserRolesReq
     const updatedUserData =  await updatedUser.populate({
         path: "roles",
         select: "name -_id",
-        transform: doc => doc === null ? null : doc.name,
         populate: {
             path: "permissions",
             select: "name -_id",
-            transform: doc => doc === null ? null : doc.name
         }
     }) as AuthenticatedUser;
 

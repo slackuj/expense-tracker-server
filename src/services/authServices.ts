@@ -34,14 +34,15 @@ export const login = async (data: UserLoginRequest) => {
         .populate({
         path: "roles",
         select: "name -_id",
-        transform: doc => doc === null ? null : doc.name,
+        //transform: doc => doc === null ? null : doc.name,
             populate: {
                 path:"permissions",
                 select: "name -_id",
-                transform: doc => doc === null ? null : doc.name,
-            }
+                //transform: doc => doc === null ? null : doc.name,
+            },
         }) // ( roles  & names ) object array mapped into names array inside generateAccessToken
         .select("+password") as AuthenticatedUser;
+
 
     if (!user) {
         throw new Error("User not found");
@@ -93,11 +94,11 @@ export const refreshAccessToken = async (refreshToken: string) => {
         .populate({
             path: "roles",
             select: "name -_id",
-            transform: doc => doc === null ? null : doc.name,
+            //transform: doc => doc === null ? null : doc.name,
             populate: {
                 path: "permissions",
                 select: "name -_id",
-                transform: doc => doc === null ? null : doc.name,
+                //transform: doc => doc === null ? null : doc.name,
             }
         }).select("+password") as AuthenticatedUser;// as AuthenticatedUser type conversion works when `.select("+password") is appended !!!
     if (!user) {

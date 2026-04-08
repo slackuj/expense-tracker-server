@@ -31,7 +31,8 @@ export const deleteById = async (id: string) => {
 }
 
 export const getAll = async() => {
-    return await PermissionModel.find().exec();
+    return await PermissionModel.find().sort({ name: 1, _id: 1 })
+        .exec();
 };
 
 export const getById = async (id: string) => {

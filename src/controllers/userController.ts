@@ -26,7 +26,24 @@ export const fetchUserById = async(
 ) => {
     try {
         const userId = String(req.params.id);
-        const response = await userServices.fetchUserById(userId);
+        const response = await userServices.fetchUserById({userId: userId});
+        return successResponse(
+            res,
+            { data: response },
+        );
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const fetchSelf = async(
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+) => {
+    try {
+        const currentUserId = req.user!.id; // authentication and authorization ensure that req.user is defined
+        const response = await userServices.fetchUserById({currentUserId: currentUserId});
         return successResponse(
             res,
             { data: response },

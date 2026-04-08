@@ -37,7 +37,7 @@ export const updateById = async (id: string, data: EditRoleRequest) => {
     const updatedRole =  await RoleModel.findOneAndUpdate(
         {
             name: { $ne: "SUPER_ADMIN" },// updating SUPER ADMIN role is redundant
-            id
+            _id: id
         },
         data,
         { returnDocument: "after" }
@@ -52,7 +52,7 @@ export const updateById = async (id: string, data: EditRoleRequest) => {
 export const deleteById = async (id: string) => {
     const deletedRole = await RoleModel.findOneAndDelete({
         name: { $ne: "SUPER_ADMIN" },// do not allow to delete SUPER ADMIN role
-        id
+        _id: id
     }).exec();
     if (!deletedRole) {
         throw new Error(`Role does not exists!`);
@@ -65,7 +65,7 @@ export const getAll = async() => {
             path: "permissions",
             select: "name -_id",
             transform: doc => doc === null ? null : doc.name,
-        })
+        }).sort({ name: 1, _id: 1 })
         .exec();
 };
 
