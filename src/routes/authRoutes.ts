@@ -9,4 +9,4 @@ export const authRoutes = Router();
 authRoutes.post("/register", validateRequestBody(UserRegisterRequestSchema), authController.register);
 authRoutes.post("/login", validateRequestBody(UserLoginRequestSchema), authController.login);
 authRoutes.post("/refresh", authController.refresh);
-authRoutes.post("/logout", authenticate, authController.refresh);
+authRoutes.post("/logout", authenticate, authController.logout);

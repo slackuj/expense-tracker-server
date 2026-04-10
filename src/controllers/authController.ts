@@ -51,7 +51,7 @@ export const refresh = async(
     try {
         const refreshToken = req.cookies?.refreshToken;
         if (!refreshToken) {
-            return unauthorizedResponse( res, { message: "Refresh token missing" });
+            return unauthorizedResponse( res, { status: httpCodes.UNAUTHORIZED.statusCode, message: "Refresh token missing" });
         }
 
         const response = await authServices.refreshAccessToken(refreshToken);
@@ -73,6 +73,12 @@ export const logout = async(
         }
 
         await authServices.logout(refreshToken);
+        res.clearCookie("refreshToken", {
+            httpOnly: true,
+            secure: false,
+            sameSite: "strict",
+        });
+
         return successResponse( res, { status: httpCodes.NO_CONTENT.statusCode } );
     } catch (error) {
         next(error);
