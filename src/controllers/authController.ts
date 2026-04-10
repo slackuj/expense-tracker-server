@@ -27,9 +27,16 @@ export const login = async(
 ) => {
     try {
         const response = await authServices.login(req.body);
+        // set refreshToken in a secure cookie
+        res.cookie("refreshToken", response.refreshToken,{
+            httpOnly: true,
+            secure: false,
+            sameSite: "strict",
+            maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
+        });
         return successResponse(
             res,
-            { data: response },
+            { data: { accessToken :response.accessToken } },
         );
     } catch (error) {
         next(error);
