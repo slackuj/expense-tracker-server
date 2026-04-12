@@ -18,12 +18,15 @@ export const register = async (data: registerData) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
-    const role = await RoleModel.findOne({ name: "USER" }).select({ _id: 1 }).lean();
+    const role = await RoleModel.findOne({ name: "USER" }).select({ id: 1 }).lean();
+    if (!role) {
+        throw new Error("Role 'USER' does not exist");
+    }
     return await UserModel.create({
         name,
         email,
         password: hashedPassword,
-        roles: [String(role!.id)] // default role === "USER"
+        roles: [String(role._id)] // default role === "USER" ---- using _id because mongoose.plugin will not work here, as we are using lean() !!!
     });
 };
 
@@ -45,7 +48,7 @@ export const login = async (data: UserLoginRequest) => {
 
 
     if (!user) {
-        throw new Error("User not found");
+        throw new Error("The email you entered isn't connected to an account");
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);

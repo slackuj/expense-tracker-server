@@ -16,12 +16,12 @@ const userSchema = new mongoose.Schema<IUser>({
     { timestamps: true }
 );
 
-userSchema.post( /find/, (error: any, doc: any, next: any) => {
+/*userSchema.post( /find/, (error: any, doc: any, next: any) => {
     if (!doc || error.name === "CastError") {
         return next(new Error("User not found"));
     }
     if (error) return next(error);
     next();
-});
+});*/
 
 export const UserModel = mongoose.model<IUser>("User", userSchema);

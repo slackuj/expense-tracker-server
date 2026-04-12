@@ -101,35 +101,44 @@ const seed = async () => {
     console.log(`${roles.length} roles inserted!`);
 
     // create SUPER ADMIN
-    const superAdmin = await RoleModel.findOne({ name: "SUPER_ADMIN" }).select({ _id: 1 }).lean();
+    const superAdminRole = await RoleModel.findOne({ name: "SUPER_ADMIN" }).select({ id: 1 }).lean();
+    if (!superAdminRole) {
+        throw new Error("Role 'SUPER_ADMIN' does not exist");
+    }
     let hashedPassword = await bcrypt.hash(SUPER_ADMIN_PASSWORD, SALT_ROUNDS);
     await UserModel.create({
         name: SUPER_ADMIN_NAME,
         email: SUPER_ADMIN_EMAIL,
         password: hashedPassword,
-        roles: [String(superAdmin!._id)]
+        roles: [String(superAdminRole._id)]
     });
     console.log("SUPER_ADMIN created...");
 
     // create ADMIN
-    const admin = await RoleModel.findOne({ name: "ADMIN" }).select({ _id: 1 }).lean();
+    const adminRole = await RoleModel.findOne({ name: "ADMIN" }).select({ id: 1 }).lean();
+    if (!adminRole) {
+        throw new Error("Role 'ADMIN' does not exist");
+    }
     hashedPassword = await bcrypt.hash(ADMIN_PASSWORD, SALT_ROUNDS);
     await UserModel.create({
         name: ADMIN_NAME,
         email: ADMIN_EMAIL,
         password: hashedPassword,
-        roles: [String(admin!._id)]
+        roles: [String(adminRole._id)]
     });
     console.log("ADMIN created...");
 
     // create USER
-    const user = await RoleModel.findOne({ name: "USER" }).select({ _id: 1 }).lean();
+    const userRole = await RoleModel.findOne({ name: "USER" }).select({ id: 1 }).lean();
+    if (!userRole) {
+        throw new Error("Role 'USER' does not exist");
+    }
     hashedPassword = await bcrypt.hash(USER_PASSWORD, SALT_ROUNDS);
     await UserModel.create({
         name: USER_NAME,
         email: USER_EMAIL,
         password: hashedPassword,
-        roles: [String(user!._id)]
+        roles: [String(userRole._id)]
     });
     console.log("USER created...");
 
