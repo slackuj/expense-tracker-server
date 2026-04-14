@@ -16,7 +16,8 @@ export const generateAccessToken = (user : AuthenticatedUser) => {
     //console.log(permissionNames);
     return jwt.sign(
         {
-            exp: Math.floor(Date.now() / 1000) + 15 * 60, //  15 minutes
+            //exp: Math.floor(Date.now() / 1000) + 15 * 60, //  15 minutes
+            exp: Math.floor(Date.now() / 1000) + 60, //  1 minute
             id: user.id,
             name: user.name,
             email: user.email,
