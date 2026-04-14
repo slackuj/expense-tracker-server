@@ -1,5 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { errorResponse } from "../utils/responseHelper";
+import {TokenExpiredError} from "jsonwebtoken";
+import {httpCodes} from "../constants/httpCodes";
 
 export const errorHandler = (
     error: any,
@@ -7,8 +9,16 @@ export const errorHandler = (
     res: Response,
     next: NextFunction,
 ) => {
-    const status: number = error.status || 500;
-    const message: string = error.message || "Internal Server Error";
+    const { status, message } = error;
+    if (error instanceof TokenExpiredError) {
+        return errorResponse(
+            res,
+            {
+                status: httpCodes.UNAUTHORIZED.statusCode,
+                message: "Access Token Expired"
+            }
+        );
+    }
 
     return errorResponse(res, { status, message });
 };

@@ -59,6 +59,7 @@ export const notFoundResponse = (
     });
 };
 
+// replace by errorResponse
 export const unauthorizedResponse = (
     res: Response,
     {

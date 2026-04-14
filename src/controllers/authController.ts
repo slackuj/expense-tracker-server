@@ -55,7 +55,17 @@ export const refresh = async(
         }
 
         const response = await authServices.refreshAccessToken(refreshToken);
-        return successResponse( res, { data: response });
+        // set refreshToken in a secure cookie
+        res.cookie("refreshToken", response.refreshToken,{
+            httpOnly: true,
+            secure: false,
+            sameSite: "strict",
+            maxAge: 30 * 24 * 60 * 60 * 1000 // 30 days
+        });
+        return successResponse(
+            res,
+            { data: { accessToken :response.accessToken } },
+        );
     } catch (error) {
         next(error);
     }
