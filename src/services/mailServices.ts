@@ -1,11 +1,11 @@
 import {sendMail} from "../utils/sendMail";
 import {mailMessages} from "../constants/mailMessages";
-import {generateOTP} from "../utils/generateOTP";
+import {generateOTP} from "../utils/otpUtil";
 
 export const sendNewAccountConfirmationEmail = async (userEmail: string) => {
-    const { subject, html } = mailMessages.CONFIRM_NEW_ACCOUNT;
     const generatedOTP = generateOTP();
-    html.replace('generatedOTP', generatedOTP);
-    await sendMail(userEmail, subject, html);
+    const { subject, html } = mailMessages.CONFIRM_NEW_ACCOUNT;
+    const HTML = html(generatedOTP);
+    await sendMail(userEmail, subject, HTML);
     return generatedOTP;
 };

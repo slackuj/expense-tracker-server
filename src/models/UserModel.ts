@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import {otpExpiryDate} from "../constants/authConstants";
+import {otpExpiryDate} from "../utils/otpUtil";
 
 export interface IUser extends mongoose.Document {
     name: string;
@@ -30,7 +30,7 @@ const unConfirmedUserSchema = new mongoose.Schema<IUnconfirmedUser>({
         email: { type: String, required: true, unique: true },
         password: { type: String, required: true, select: false },
         confirmationCode: { type: String, required: true },
-        expiresAt: { type: Date, default: otpExpiryDate, expires: '1d' }, // unconfirmed users get cleared after 1 day
+        expiresAt: { type: Date, default: otpExpiryDate(), expires: '1d' }, // unconfirmed users get cleared after 1 day
     },
     { timestamps: true }
 );

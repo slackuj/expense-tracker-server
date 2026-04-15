@@ -1,6 +1,6 @@
 import {AuthenticatedUser, UserLoginRequest, UserRegisterRequest} from "../types/user";
 import {UnConfirmedUserModel, UserModel} from "../models/UserModel";
-import {otpExpiryDate, SALT_ROUNDS} from "../constants/authConstants";
+import {SALT_ROUNDS} from "../constants/authConstants";
 import bcrypt from "bcrypt";
 import {generateAccessToken, generateRefreshToken} from "../utils/authUtil";
 import jwt, {JwtPayload} from "jsonwebtoken";
@@ -9,7 +9,7 @@ import * as sessionServices from "./sessionServices";
 import * as mailServices from "./mailServices";
 import {RoleModel} from "../models/RoleModel";
 import {ResendConfirmationCodeRequest, UserConfirmationRequest} from "../types/auth";
-import {generateOTP} from "../utils/generateOTP";
+import {otpExpiryDate} from "../utils/otpUtil";
 
 type registerData = Omit<UserRegisterRequest, "confirmPassword">;
 export const register = async (data: registerData, code: string) => {
@@ -82,7 +82,7 @@ export const resendConfirmationCode = async (data: ResendConfirmationCodeRequest
     if (existingUnConfirmedUser) {
         const newOTP = await mailServices.sendNewAccountConfirmationEmail(email);
         existingUnConfirmedUser.confirmationCode = newOTP;
-        existingUnConfirmedUser.expiresAt = otpExpiryDate;
+        existingUnConfirmedUser.expiresAt = otpExpiryDate();
         // save changes
         await existingUnConfirmedUser.save();
         return existingUnConfirmedUser;
