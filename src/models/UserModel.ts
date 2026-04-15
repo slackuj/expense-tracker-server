@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import {otpExpiryDate} from "../constants/authConstants";
 
 export interface IUser extends mongoose.Document {
     name: string;
@@ -7,12 +8,30 @@ export interface IUser extends mongoose.Document {
     roles: string[];// array of role IDs
 }
 
+export interface IUnconfirmedUser extends mongoose.Document {
+    name: string;
+    email: string;
+    password: string;
+    confirmationCode: number;
+    expiresAt: Date;
+}
+
 const userSchema = new mongoose.Schema<IUser>({
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true, select: false },
     roles: [ {type: String, ref: "Role"} ],
 },
+    { timestamps: true }
+);
+
+const unConfirmedUserSchema = new mongoose.Schema<IUnconfirmedUser>({
+        name: { type: String, required: true },
+        email: { type: String, required: true, unique: true },
+        password: { type: String, required: true, select: false },
+        confirmationCode: { type: Number, required: true },
+        expiresAt: { type: Date, default: otpExpiryDate, expires: 0 },
+    },
     { timestamps: true }
 );
 
@@ -25,3 +44,4 @@ const userSchema = new mongoose.Schema<IUser>({
 });*/
 
 export const UserModel = mongoose.model<IUser>("User", userSchema);
+export const UnConfirmedUserModel = mongoose.model<IUnconfirmedUser>("UnConfirmedUser", unConfirmedUserSchema);

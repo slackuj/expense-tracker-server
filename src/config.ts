@@ -8,6 +8,8 @@ const envSchema = z.object({
     MONGO_URI: z.url("MONGO_URI must be a valid URL"),
     JWT_SECRET_ACCESS: z.string().min(32, "JWT_SECRET should be at least 32 characters for security"),
     JWT_SECRET_REFRESH: z.string().min(32, "JWT_SECRET should be at least 32 characters for security"),
+    GOOGLE_APP_EMAIL: z.email("invalid SMTP_EMAIL address"),
+    GOOGLE_APP_PASSWORD: z.string().length(16, "password must be 16 characters long"),
 });
 
 const envServer = envSchema.safeParse(process.env);
