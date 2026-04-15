@@ -85,7 +85,7 @@ export const resendConfirmationCode = async (data: ResendConfirmationCodeRequest
         existingUnConfirmedUser.expiresAt = otpExpiryDate;
         // save changes
         await existingUnConfirmedUser.save();
-        return newOTP;
+        return existingUnConfirmedUser;
 
     } else {
         throw new Error("User not registered");

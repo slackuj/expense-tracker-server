@@ -10,10 +10,17 @@ export const resendConfirmationCode = async(
     next: NextFunction
 ) => {
     try {
-        await authServices.resendConfirmationCode(req.body);
+        const response = await authServices.resendConfirmationCode(req.body);
         return successResponse(
             res,
-            { status: httpCodes.RESOURCE_CREATED.statusCode }
+            {
+                status: httpCodes.RESOURCE_CREATED.statusCode,
+                data: {
+                    expiresAt: response.expiresAt.getTime(),
+                    email: response.email,
+                },
+                message: "check your email for the confirmation code",
+            },
         );
     } catch (error) {
         next(error);
