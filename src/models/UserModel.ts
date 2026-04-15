@@ -12,7 +12,7 @@ export interface IUnconfirmedUser extends mongoose.Document {
     name: string;
     email: string;
     password: string;
-    confirmationCode: number;
+    confirmationCode: string;
     expiresAt: Date;
 }
 
@@ -29,7 +29,7 @@ const unConfirmedUserSchema = new mongoose.Schema<IUnconfirmedUser>({
         name: { type: String, required: true },
         email: { type: String, required: true, unique: true },
         password: { type: String, required: true, select: false },
-        confirmationCode: { type: Number, required: true },
+        confirmationCode: { type: String, required: true },
         expiresAt: { type: Date, default: otpExpiryDate, expires: 0 },
     },
     { timestamps: true }

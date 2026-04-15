@@ -1,5 +1,5 @@
 import {AuthenticatedUser, UserLoginRequest, UserRegisterRequest} from "../types/user";
-import {UserModel} from "../models/UserModel";
+import {UnConfirmedUserModel, UserModel} from "../models/UserModel";
 import {SALT_ROUNDS} from "../constants/authConstants";
 import bcrypt from "bcrypt";
 import {generateAccessToken, generateRefreshToken} from "../utils/authUtil";
@@ -7,17 +7,50 @@ import jwt, {JwtPayload} from "jsonwebtoken";
 import {config} from "../config";
 import * as sessionServices from "./sessionServices";
 import {RoleModel} from "../models/RoleModel";
+import {UserConfirmationRequest} from "../types/auth";
 
 type registerData = Omit<UserRegisterRequest, "confirmPassword">;
-export const register = async (data: registerData) => {
+export const register = async (data: registerData, code: string) => {
     const { name, email, password } = data;
-    const existingUser = await UserModel.findOne({ email });
 
+    const existingUser = await UserModel.findOne({ email });
     if (existingUser) {
         throw new Error("User already exists");
     }
 
+    const existingUnConfirmedUser = await UnConfirmedUserModel.findOne({ email }).select("+password");
+    if (existingUnConfirmedUser) {
+        // navigate client to confirmation page
+        throw new Error("User already registered, please confirm your account");
+    }
+
     const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
+    return await UnConfirmedUserModel.create({
+        name,
+        email,
+        password: hashedPassword,
+        confirmationCode: code
+    });
+};
+
+// service to confirm new account
+export const confirm = async (data: UserConfirmationRequest) => {
+    const { email, code } = data;
+    const existingUser = await UserModel.findOne({ email });
+    if (existingUser) {
+        throw new Error("User already exists");
+    }
+
+    const existingUnConfirmedUser = await UnConfirmedUserModel.findOne({ email }).select("+password");
+    if (!existingUnConfirmedUser) {
+        throw new Error("User not registered");
+    }
+
+    const { name, password, confirmationCode } = existingUnConfirmedUser;
+    if (code !== confirmationCode){
+        throw new Error("Invalid Confirmation Code");
+    }
+
     const role = await RoleModel.findOne({ name: "USER" }).select({ id: 1 }).lean();
     if (!role) {
         throw new Error("Role 'USER' does not exist");
@@ -25,7 +58,7 @@ export const register = async (data: registerData) => {
     return await UserModel.create({
         name,
         email,
-        password: hashedPassword,
+        password,
         roles: [String(role._id)] // default role === "USER" ---- using _id because mongoose.plugin will not work here, as we are using lean() !!!
     });
 };

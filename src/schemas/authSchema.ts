@@ -10,7 +10,7 @@ const strongPasswordSchema = z.string()
 
 export const UserRegisterRequestSchema = z.object({
     name: z.string().min(5, "Name must be at least 5 characters"),
-    email: z.email("Please enter a valid email address"),
+    email: z.email("Invalid email address"),
     password: strongPasswordSchema,
     confirmPassword: z.string(),
 }).refine(
@@ -19,6 +19,11 @@ export const UserRegisterRequestSchema = z.object({
         path: ["confirmPassword"], // This attaches the error to the confirmPassword field
     }
 ).transform(({ confirmPassword, ...data }) => data);// strips confirmPassword from the final object returned by zod after validation (i.e schema.safeParse(req.body) inside validator.ts !!!)
+
+export const UserConfirmationRequestSchema = z.object({
+    email: z.email("Invalid email address"),
+    code: z.string().length(6)
+});
 
 export const UserLoginRequestSchema = z.object({
     email: z.email("Please enter a valid email address"),

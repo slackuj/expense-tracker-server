@@ -1,19 +1,46 @@
 import {NextFunction, Response, Request} from "express";
+import * as mailServices from "../services/mailServices";
 import * as authServices from "../services/authServices";
 import {successResponse, unauthorizedResponse} from "../utils/responseHelper";
 import {httpCodes} from "../constants/httpCodes";
 
-export const register = async(
+export const confirm = async(
     req: Request,
     res: Response,
     next: NextFunction
 ) => {
     try {
-        //console.log('req received from zod after validation',req.body);
-        await authServices.register(req.body);
+        await authServices.confirm(req.body);
         return successResponse(
             res,
             { status: httpCodes.RESOURCE_CREATED.statusCode }
+        );
+    } catch (error) {
+        next(error);
+    }
+};
+
+export const register = async(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+) => {
+    try{
+        const { email } = req.body;
+        const generatedOTP = await mailServices.sendNewAccountConfirmationEmail(email);
+        // create temp user
+        const response = await authServices.register(req.body, generatedOTP);
+        // return response
+        return successResponse(
+            res,
+            {
+                status: httpCodes.RESOURCE_CREATED.statusCode,
+                data: {
+                    expiresAt: response.expiresAt.getTime(),
+                    email: email,
+                },
+                message: "check your email for the confirmation code",
+            },
         );
     } catch (error) {
         next(error);

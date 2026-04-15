@@ -7,6 +7,7 @@ import {authenticate} from "../middlewares/authenticate";
 export const authRoutes = Router();
 
 authRoutes.post("/register", validateRequestBody(UserRegisterRequestSchema), authController.register);
+authRoutes.post("/confirm", validateRequestBody(UserRegisterRequestSchema), authController.confirm);
 authRoutes.post("/login", validateRequestBody(UserLoginRequestSchema), authController.login);
 authRoutes.post("/refresh", authController.refresh);
 authRoutes.post("/logout", authenticate, authController.logout);
