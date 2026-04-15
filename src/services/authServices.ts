@@ -62,12 +62,14 @@ export const confirm = async (data: UserConfirmationRequest) => {
     if (!role) {
         throw new Error("Role 'USER' does not exist");
     }
-    return await UserModel.create({
+    await UserModel.create({
         name,
         email,
         password,
         roles: [String(role._id)] // default role === "USER" ---- using _id because mongoose.plugin will not work here, as we are using lean() !!!
     });
+    // delete user from UnConfirmedUsers
+    await UnConfirmedUserModel.findOneAndDelete({email});
 };
 
 // resends a new confirmation code
