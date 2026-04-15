@@ -4,6 +4,22 @@ import * as authServices from "../services/authServices";
 import {successResponse, unauthorizedResponse} from "../utils/responseHelper";
 import {httpCodes} from "../constants/httpCodes";
 
+export const resendConfirmationCode = async(
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    try {
+        await authServices.resendConfirmationCode(req.body);
+        return successResponse(
+            res,
+            { status: httpCodes.RESOURCE_CREATED.statusCode }
+        );
+    } catch (error) {
+        next(error);
+    }
+};
+
 export const confirm = async(
     req: Request,
     res: Response,

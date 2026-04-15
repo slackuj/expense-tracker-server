@@ -1,24 +1,26 @@
 import {AuthenticatedUser, UserLoginRequest, UserRegisterRequest} from "../types/user";
 import {UnConfirmedUserModel, UserModel} from "../models/UserModel";
-import {SALT_ROUNDS} from "../constants/authConstants";
+import {otpExpiryDate, SALT_ROUNDS} from "../constants/authConstants";
 import bcrypt from "bcrypt";
 import {generateAccessToken, generateRefreshToken} from "../utils/authUtil";
 import jwt, {JwtPayload} from "jsonwebtoken";
 import {config} from "../config";
 import * as sessionServices from "./sessionServices";
+import * as mailServices from "./mailServices";
 import {RoleModel} from "../models/RoleModel";
-import {UserConfirmationRequest} from "../types/auth";
+import {ResendConfirmationCodeRequest, UserConfirmationRequest} from "../types/auth";
+import {generateOTP} from "../utils/generateOTP";
 
 type registerData = Omit<UserRegisterRequest, "confirmPassword">;
 export const register = async (data: registerData, code: string) => {
     const { name, email, password } = data;
 
-    const existingUser = await UserModel.findOne({ email });
+    const existingUser = await UserModel.exists({ email: email });
     if (existingUser) {
         throw new Error("User already exists");
     }
 
-    const existingUnConfirmedUser = await UnConfirmedUserModel.findOne({ email }).select("+password");
+    const existingUnConfirmedUser = await UnConfirmedUserModel.exists({ email: email });
     if (existingUnConfirmedUser) {
         // navigate client to confirmation page
         throw new Error("User already registered, please confirm your account");
@@ -36,7 +38,7 @@ export const register = async (data: registerData, code: string) => {
 // service to confirm new account
 export const confirm = async (data: UserConfirmationRequest) => {
     const { email, code } = data;
-    const existingUser = await UserModel.findOne({ email });
+    const existingUser = await UserModel.exists({email: email});
     if (existingUser) {
         throw new Error("User already exists");
     }
@@ -46,7 +48,12 @@ export const confirm = async (data: UserConfirmationRequest) => {
         throw new Error("User not registered");
     }
 
-    const { name, password, confirmationCode } = existingUnConfirmedUser;
+    const { name, password, confirmationCode, expiresAt } = existingUnConfirmedUser;
+
+    if (Date.now() > expiresAt.getTime()) {
+        throw new Error("Code Expired");
+    }
+
     if (code !== confirmationCode){
         throw new Error("Invalid Confirmation Code");
     }
@@ -62,6 +69,29 @@ export const confirm = async (data: UserConfirmationRequest) => {
         roles: [String(role._id)] // default role === "USER" ---- using _id because mongoose.plugin will not work here, as we are using lean() !!!
     });
 };
+
+// resends a new confirmation code
+export const resendConfirmationCode = async (data: ResendConfirmationCodeRequest) => {
+    const { email } = data;
+    const existingUser = await UserModel.exists({ email: email });
+    if (existingUser) {
+        throw new Error("User already exists");
+    }
+
+    const existingUnConfirmedUser = await UnConfirmedUserModel.findOne({ email });
+    if (existingUnConfirmedUser) {
+        const newOTP = await mailServices.sendNewAccountConfirmationEmail(email);
+        existingUnConfirmedUser.confirmationCode = newOTP;
+        existingUnConfirmedUser.expiresAt = otpExpiryDate;
+        // save changes
+        await existingUnConfirmedUser.save();
+        return newOTP;
+
+    } else {
+        throw new Error("User not registered");
+    }
+};
+
 
 export const login = async (data: UserLoginRequest) => {
 

@@ -1,13 +1,19 @@
 import {Router} from "express";
 import {validateRequestBody} from "../middlewares/validator";
-import {UserLoginRequestSchema, UserRegisterRequestSchema} from "../schemas/authSchema";
+import {
+    ResendConfirmationCodeSchema,
+    UserConfirmationRequestSchema,
+    UserLoginRequestSchema,
+    UserRegisterRequestSchema
+} from "../schemas/authSchema";
 import * as authController from "../controllers/authController";
 import {authenticate} from "../middlewares/authenticate";
 
 export const authRoutes = Router();
 
 authRoutes.post("/register", validateRequestBody(UserRegisterRequestSchema), authController.register);
-authRoutes.post("/confirm", validateRequestBody(UserRegisterRequestSchema), authController.confirm);
+authRoutes.post("/confirm", validateRequestBody(UserConfirmationRequestSchema), authController.confirm);
+authRoutes.post("/resend-code", validateRequestBody(ResendConfirmationCodeSchema), authController.resendConfirmationCode);
 authRoutes.post("/login", validateRequestBody(UserLoginRequestSchema), authController.login);
 authRoutes.post("/refresh", authController.refresh);
 authRoutes.post("/logout", authenticate, authController.logout);

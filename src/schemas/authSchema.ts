@@ -25,6 +25,10 @@ export const UserConfirmationRequestSchema = z.object({
     code: z.string().length(6)
 });
 
+export const ResendConfirmationCodeSchema = z.object({
+    email: z.email("Invalid email address"),
+});
+
 export const UserLoginRequestSchema = z.object({
     email: z.email("Please enter a valid email address"),
     password: z.string().min(8, "The password you entered is incorrect"),
